@@ -24,9 +24,24 @@ app.use(cors({
 
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB Connected")).catch((error) => console.log(error));
-
 app.use(express.json());
+
+let isConnected = false;
+async function connectDB() {
+    if (isConnected) return;
+
+    try {
+        const conn = await mongoose.connect(process.env.MONGO_URI, {
+            serverSelectionTimeoutMS: 10000,
+        });
+        isConnected = conn.connections[0].readyState === 1;
+        console.log("MongoDB Connected");
+    } catch (error) {
+        console.log("MongoDB Connection Error:", error);
+    }
+}
+
+connectDB();
 
 app.use("/uploads", express.static("uploads"));
 
