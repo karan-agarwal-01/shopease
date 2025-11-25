@@ -6,18 +6,18 @@ const setTokenCookies = (res, _id) => {
     const accessToken = generateAccessToken(_id);
     const refreshToken = generateRefreshToken(_id);
 
-    const isProduction = process.env.NODE_ENV === 'production';
+    // const isProduction = process.env.NODE_ENV === 'production';
 
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
+        secure: true,
+        sameSite: "none",
         maxAge: 60 * 60 * 1000
     })
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
+        secure: true,
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 }
@@ -79,12 +79,12 @@ exports.refreshAccessToken = async (req, res) => {
         }
 
         const newAccessToken = generateAccessToken(_id);
-        const isProduction = process.env.NODE_ENV === 'production';
+        // const isProduction = process.env.NODE_ENV === 'production';
 
         res.cookie('accessToken', newAccessToken, {
             httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "none" : "lax",
+            secure: true,
+            sameSite: "none",
             maxAge: 60 * 60 * 1000
         });
 
@@ -97,8 +97,8 @@ exports.refreshAccessToken = async (req, res) => {
 }
 
 exports.logoutUser = (req, res) => {
-    res.clearCookie('accessToken', { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax" });
-    res.clearCookie('refreshToken', { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax" });
+    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: "none" });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: "none" });
     res.json({ message: 'Logged out successfully' });
 };
 
