@@ -11,14 +11,11 @@ const orderRoutes = require('./routes/order.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const connectDB = require('./config/db');
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
-
-connectDB();
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -26,6 +23,8 @@ app.use(cors({
 }));
 
 app.use(cookieParser());
+
+mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB Connected")).catch((error) => console.log(error));
 
 app.use(express.json());
 
