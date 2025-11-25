@@ -17,6 +17,30 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
+mongoose.set('bufferCommands', false);
+mongoose.set('bufferTimeoutMS', 2000);
+
+let isConnected = false; // avoid reconnecting every request
+
+async function connectDB() {
+    if (isConnected) return;
+
+    try {
+        await mongoose.connect(process.env.MONGO_URI, {
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            maxPoolSize: 5
+        });
+
+        isConnected = true;
+        console.log("MongoDB Connected Successfully");
+    } catch (error) {
+        console.error("MongoDB Connection Error →", error);
+    }
+}
+
+connectDB();
+
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
@@ -25,23 +49,6 @@ app.use(cors({
 app.use(cookieParser());
 
 app.use(express.json());
-
-let isConnected = false;
-async function connectDB() {
-    if (isConnected) return;
-
-    try {
-        const conn = await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 10000,
-        });
-        isConnected = conn.connections[0].readyState === 1;
-        console.log("MongoDB Connected");
-    } catch (error) {
-        console.log("MongoDB Connection Error:", error);
-    }
-}
-
-connectDB();
 
 app.use("/uploads", express.static("uploads"));
 
