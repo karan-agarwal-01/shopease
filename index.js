@@ -15,7 +15,6 @@ const cookieParser = require('cookie-parser');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -41,17 +40,15 @@ app.use((req, res, next) => {
     next();
 });
 
-mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB Connected")).catch((error) => console.log(error));
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB Connected"))
+    .catch((error) => console.log(error));
 
 app.use(cookieParser());
-
 app.use(express.json());
-
 app.use("/uploads", express.static("uploads"));
 
-app.get('/', (req, res) => {
-    res.send('Hare Krishna')
-})
+app.get('/', (req, res) => res.send('Hare Krishna'))
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
@@ -63,6 +60,3 @@ app.use('/api/order', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 
 module.exports = app;
-// app.listen(PORT, () => {
-//     console.log(`Server is running on PORT ${PORT}`)
-// })
