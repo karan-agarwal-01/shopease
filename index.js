@@ -18,13 +18,28 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(cors({
-    origin: ["http://localhost:5173", "https://shopease-frontend-smoky.vercel.app"],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: (origin, callback) => {
+        const allowedOrigins = [
+            "http://localhost:5173",
+            "https://shopease-frontend-smoky.vercel.app"
+        ];
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     credentials: true
 }));
 
-app.options("*", cors());
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") return res.sendStatus(200);
+    next();
+});
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB Connected")).catch((error) => console.log(error));
 
@@ -47,6 +62,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/order', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on PORT ${PORT}`)
-})
+module.exports = app;
+// app.listen(PORT, () => {
+//     console.log(`Server is running on PORT ${PORT}`)
+// })
