@@ -24,7 +24,15 @@ app.use(cors({
 
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB Connected")).catch((error) => console.log(error));
+mongoose.connect(
+    process.env.MONGO_URL,
+    { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
+    () => {
+      console.log('Connected to MongoDB');
+    }
+);
+
+// mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB Connected")).catch((error) => console.log(error));
 
 app.use(express.json());
 
