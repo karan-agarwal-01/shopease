@@ -12,13 +12,15 @@ const setTokenCookies = (res, _id) => {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 60 * 60 * 1000
+        maxAge: 60 * 60 * 1000,
+        path: "/",
     })
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: "/",
     });
 }
 
@@ -71,7 +73,7 @@ exports.refreshAccessToken = async (req, res) => {
         return res.status(401).json({ message: "No refresh token provided" })
     }
     try {
-        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         const _id = decoded.id;
         const user = await User.findById(_id)
         if (!user) {
@@ -85,7 +87,8 @@ exports.refreshAccessToken = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: "none",
-            maxAge: 60 * 60 * 1000
+            maxAge: 60 * 60 * 1000,
+            path: "/"
         });
 
         res.json({ message: 'Access token refreshed successfully' })
@@ -97,8 +100,8 @@ exports.refreshAccessToken = async (req, res) => {
 }
 
 exports.logoutUser = (req, res) => {
-    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: "none" });
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: "none" });
+    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: "none", path: '/' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: "none", path: '/' });
     res.json({ message: 'Logged out successfully' });
 };
 
@@ -108,7 +111,7 @@ exports.verifyUser = async (req, res) => {
       if (!token) {
         return res.status(401).json({ message: "Unauthorized - No token found" });
       }  
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
       const user = await User.findById(decoded.id) 
       return res.status(200).json({ success: true, user });
     } catch (error) {
