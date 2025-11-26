@@ -114,3 +114,42 @@ exports.deleteOrder = async (req, res) => {
         res.status(500).json({ message: "Server error" })
     }
 }
+
+exports.cancelOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        const order = await Order.findById(id).populate("orderItems.product");
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        if (order.user.toString() !== userId.toString()) {
+            return res.status(403).json({ message: "Not authorized to cancel this order" });
+        }
+
+        const nonCancelableStatuses = ["Shipped", "Delivered"];
+
+        if (nonCancelableStatuses.includes(order.status)) {
+            return res.status(400).json({ message: "Order cannot be canceled at this stage" });
+        }
+
+        if (order.status === "Delivered") {
+            for (let item of order.orderItems) {
+                const product = await Product.findById(item.product._id);
+                product.stock += item.quantity;
+                await product.save();
+            }
+        }
+
+        order.status = "Cancelled";
+        await order.save();
+
+        return res.status(200).json({ message: "Order cancelled successfully", order});
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
