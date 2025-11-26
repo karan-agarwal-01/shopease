@@ -11,7 +11,7 @@ const orderRoutes = require('./routes/order.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const { stripeWebhook } = require('./controllers/payment.controllers');
+express.raw = require('body-parser').raw;
 
 dotenv.config();
 
@@ -36,6 +36,7 @@ const connectDB = async () => {
 
 connectDB();
 
+const { stripeWebhook } = require('./controllers/payment.controllers');
 app.post('/api/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 app.use(express.json());
