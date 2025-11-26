@@ -23,9 +23,17 @@ app.use(cors({
     credentials: true
 }));
 
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("MongoDB Connected"))
-    .catch((error) => console.log(error));
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log('MongoDB Connected successfully!');
+    } catch (error) {
+        console.error('MongoDB connection error:', error.message);
+        process.exit(1);
+    }
+};
+
+connectDB();
 
 app.use(cookieParser());
 app.use(express.json());
