@@ -3,8 +3,7 @@
         {
         "src": "/api/webhook",
         "dest": "/api/webhook",
-        "methods": ["POST"],
-        "bodyParser": false
+        "methods": ["POST"]
         }
     ]
 }
