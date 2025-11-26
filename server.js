@@ -36,11 +36,10 @@ const connectDB = async () => {
 
 connectDB();
 
-app.use(cookieParser());
-
 app.post('/api/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/uploads", express.static("uploads"));
 
